@@ -1,0 +1,24 @@
+{
+  "name": "glcick",
+  "version": "0.1.0",
+  "description": "A generic clicker game",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "ava"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mees-/gclick.git"
+  },
+  "keywords": [
+    "game",
+    "clicker",
+    "framework"
+  ],
+  "author": "Mees van Dijk <mees@itisme.es> (http://mees.io)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mees-/gclick/issues"
+  },
+  "homepage": "https://github.com/mees-/gclick#readme"
+}
