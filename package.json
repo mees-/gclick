@@ -4,7 +4,8 @@
   "description": "A generic clicker game",
   "main": "dist/index.js",
   "scripts": {
-    "test": "ava"
+    "test": "ava",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
