@@ -17,7 +17,7 @@ export default abstract class Investment {
   lastCycle: number
 
   interval: {
-    id: number | null | undefined
+    id?: number
     lastDuration: number
   }
 
@@ -39,7 +39,6 @@ export default abstract class Investment {
     this.lastCycle = Date.now()
 
     this.interval = {
-      id: null,
       lastDuration: this.currentDuration
     }
   }
