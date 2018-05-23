@@ -1,5 +1,5 @@
 {
-  "name": "glcick",
+  "name": "gclick",
   "version": "0.1.0",
   "description": "A generic clicker game",
   "main": "dist/index.js",
