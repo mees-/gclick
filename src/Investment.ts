@@ -43,13 +43,9 @@ export default abstract class Investment {
     }
   }
   // default stubs
-  price(amount: number = this.amount) {
-    return 1
-  }
+  abstract price(amount: number): number
 
-  doubles() {
-    return 0
-  }
+  abstract doubles(): number
 
   // some computed properties
   get currentDuration(): number {
