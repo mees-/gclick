@@ -103,6 +103,12 @@ export default abstract class Investment {
     return price
   }
 
+  maxBuy(money: number): number {
+    let amount = 0
+    while (this.calculatePrice(amount + 1) <= money) amount++
+    return amount
+  }
+
   buy(amount: number = 1) {
     this.parentGame.transact(-1 * this.calculatePrice(amount))
     this.amount += amount
