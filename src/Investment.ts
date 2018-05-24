@@ -43,7 +43,7 @@ export default abstract class Investment {
     }
   }
   // default stubs
-  abstract price(amount: number): number
+  abstract price(amount?: number): number
 
   abstract doubles(): number
 
