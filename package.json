@@ -1,6 +1,6 @@
 {
   "name": "gclick",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A generic clicker game",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,11 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/mees-/gclick.git"
   },
-  "keywords": [
-    "game",
-    "clicker",
-    "framework"
-  ],
+  "keywords": ["game", "clicker", "framework"],
   "author": "Mees van Dijk <mees@itisme.es> (http://mees.io)",
   "license": "MIT",
   "bugs": {
@@ -28,7 +24,5 @@
   "devDependencies": {
     "typescript": "^2.8.3"
   },
-  "files": [
-    "dist"
-  ]
+  "files": ["dist"]
 }
