@@ -21,14 +21,7 @@ export default abstract class Investment {
     lastDuration: number
   }
 
-  constructor(
-    parentGame: Game,
-    options: InvestmentOptions = {
-      name: 'default',
-      singleProfit: 0,
-      startDuration: 1
-    }
-  ) {
+  constructor(parentGame: Game, options: InvestmentOptions) {
     this.parentGame = parentGame
 
     this.name = options.name
