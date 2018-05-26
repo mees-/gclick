@@ -19,11 +19,10 @@ export default class Game {
     this.money += money
   }
 
-  tick(listener: () => any = () => {}) {
+  tick() {
     for (const investment of this.investments) {
       investment.tick()
     }
-    listener()
   }
 
   start(listener: () => any) {
