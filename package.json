@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "ava",
+    "test": "npm run build && ava",
     "build": "tsc",
     "prepare": "npm run-script build"
   },
@@ -13,7 +13,11 @@
     "type": "git",
     "url": "git+https://github.com/mees-/gclick.git"
   },
-  "keywords": ["game", "clicker", "framework"],
+  "keywords": [
+    "game",
+    "clicker",
+    "framework"
+  ],
   "author": "Mees van Dijk <mees@itisme.es> (http://mees.io)",
   "license": "MIT",
   "bugs": {
@@ -22,7 +26,18 @@
   "homepage": "https://github.com/mees-/gclick#readme",
   "dependencies": {},
   "devDependencies": {
+    "ava": "^0.25.0",
     "typescript": "^2.8.3"
   },
-  "files": ["dist"]
+  "files": [
+    "dist"
+  ],
+  "ava": {
+    "files": [
+      "dist/**/*.test.js"
+    ],
+    "sources": [
+      "src/**/*.ts"
+    ]
+  }
 }
