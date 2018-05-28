@@ -1,15 +1,30 @@
 import Investment from './Investment'
+import DividingNumber from './DividingNumber'
 
 export default class Game {
   investments: Array<Investment>
-  money: number
   constructor(investments: Array<{ new (game: Game): Investment }> = []) {
-    this.money = 0
-
     const self = this
     this.investments = investments.map(
       InvestmentClass => new InvestmentClass(self)
     )
+  }
+
+  private _money = new DividingNumber()
+
+  get money(): number {
+    return this._money.value
+  }
+  set money(val: number) {
+    this._money.value = val
+  }
+
+  get divisionLevel(): number {
+    return this._money.dividerLevel
+  }
+
+  set divisionLevel(val: number) {
+    throw new Error('divisionLevel is read-only')
   }
 
   transact(money: number) {

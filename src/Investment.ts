@@ -1,9 +1,15 @@
 import Game from './Game'
+import DividingNumber from './DividingNumber'
 
 export type InvestmentOptions = {
   name: string
   singleProfit: number
   startDuration: number
+}
+
+export type Interval = {
+  id?: number
+  lastDuration: number
 }
 
 export default abstract class Investment {
@@ -13,28 +19,24 @@ export default abstract class Investment {
   singleProfit: number
   startDuration: number
 
-  amount: number
-  lastCycle: number
-
-  interval: {
-    id?: number
-    lastDuration: number
-  }
-
-  constructor(parentGame: Game, options: InvestmentOptions) {
+  constructor(
+    parentGame: Game,
+    { name, singleProfit, startDuration }: InvestmentOptions
+  ) {
     this.parentGame = parentGame
 
-    this.name = options.name
-    this.startDuration = options.startDuration
-    this.singleProfit = options.singleProfit
-
-    this.amount = 0
-    this.lastCycle = Date.now()
-
-    this.interval = {
-      lastDuration: this.currentDuration
-    }
+    this.name = name
+    this.startDuration = startDuration
+    this.singleProfit = singleProfit
   }
+
+  lastCycle = Date.now()
+  interval: Interval = {
+    lastDuration: this.currentDuration
+  }
+  private _profitPerCycle = new DividingNumber(this.amount * this.singleProfit)
+  private _amount = 0
+
   // default stubs
   abstract price(amount?: number): number
 
@@ -46,7 +48,24 @@ export default abstract class Investment {
   }
 
   get profitPerCycle(): number {
-    return this.amount * this.singleProfit
+    return this._profitPerCycle.value
+  }
+
+  set profitPerCycle(val: number) {
+    this._profitPerCycle.value = val
+  }
+
+  get divisionLevel(): number {
+    return this._profitPerCycle.dividerLevel
+  }
+
+  get amount(): number {
+    return this._amount
+  }
+
+  set amount(val: number) {
+    this._amount = val
+    this.profitPerCycle = this.amount * this.singleProfit
   }
 
   get profitPerSecond(): number {
@@ -132,5 +151,8 @@ export default abstract class Investment {
   }
   set timeInCurrentCycle(val: number) {
     throw new Error('timeInCurrentCycle is read-only')
+  }
+  set divisionLevel(val: number) {
+    throw new Error('divisionLevel is read-only')
   }
 }
