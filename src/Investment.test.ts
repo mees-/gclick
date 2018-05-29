@@ -97,3 +97,24 @@ test('Investment#tick', async t => {
   investment.tick()
   t.is(lastAdded, 2 * investment.singleProfit)
 })
+
+test('Investment#calculatePrice', t => {
+  const game = new Game([TestInvestment])
+  const [investment] = game.investments
+
+  investment.amount = 1
+  t.is(investment.calculatePrice(10), 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10)
+})
+
+test('Investment#maxBuy', t => {
+  const game = new Game([TestInvestment])
+  const [investment] = game.investments
+
+  let amount = 0
+  let price = 0
+  while (price <= 100) {
+    amount++
+    price += amount
+  }
+  t.is(investment.maxBuy(100), amount)
+})
