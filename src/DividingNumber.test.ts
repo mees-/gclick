@@ -30,4 +30,20 @@ test('properly updates number with division step', t => {
   num.value *= 100
   t.is(num.value, 10 * 100 / 1000)
   t.is(num.dividerLevel, 1)
+
+  num.value *= 10000
+  t.is(num.value, 10)
+  t.is(num.dividerLevel, 2)
+})
+
+test('can jump multiple levels at once', t => {
+  const num = new DividingNumber()
+
+  num.value = 1000 * 1000
+  t.is(num.value, 1)
+  t.is(num.dividerLevel, 2)
+
+  num.value = 1000 * 1000 * 1000 * 10
+  t.is(num.value, 10)
+  t.is(num.dividerLevel, 5)
 })

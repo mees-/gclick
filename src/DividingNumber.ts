@@ -13,11 +13,10 @@ export default class DividingNumber {
   }
 
   set value(val: number) {
-    if (val >= this.step) {
+    this._value = val
+    while (this._value >= this.step) {
+      this._value /= this.step
       this.dividerLevel++
-      this._value = val / this.step
-    } else {
-      this._value = val
     }
   }
 }
