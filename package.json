@@ -26,7 +26,9 @@
   "homepage": "https://github.com/mees-/gclick#readme",
   "dependencies": {},
   "devDependencies": {
+    "@types/delay": "^2.0.1",
     "ava": "^0.25.0",
+    "delay": "^3.0.0",
     "typescript": "^2.8.3"
   },
   "files": [
