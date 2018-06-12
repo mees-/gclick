@@ -34,8 +34,12 @@ export default abstract class Investment {
   interval: Interval = {
     lastDuration: this.currentDuration
   }
-  private _profitPerCycle = new DividingNumber(this.amount * this.singleProfit)
-  private _amount = 0
+  // the private keyword here is omitted because of a typescript bug: https://github.com/Microsoft/TypeScript/issues/17293
+  // this is because the investment class is extended in an expression in createPresetFromSettings.ts
+  // private
+  _profitPerCycle = new DividingNumber(this.amount * this.singleProfit)
+  // private
+  _amount = 0
 
   // default stubs
   abstract price(amount?: number): number
