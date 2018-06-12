@@ -12,6 +12,22 @@ export type Interval = {
   lastDuration: number
 }
 
+type InvestmentSettings = {
+  name: string
+  singleProfit: number
+  startDuration: number
+  doubles: (amount: number) => number
+  price: (amount: number) => number
+}
+
+export type rawInvestmentSettings = {
+  name: string
+  singleProfit: number
+  startDuration: number
+  doubles: string
+  price: string
+}
+
 export default abstract class Investment {
   name: string
   parentGame: Game
@@ -158,5 +174,34 @@ export default abstract class Investment {
   }
   set divisionLevel(val: number) {
     throw new Error('divisionLevel is read-only')
+  }
+
+  static fromSettings(rawSettings: rawInvestmentSettings) {
+    const settings: InvestmentSettings = {
+      ...rawSettings,
+      price: eval(rawSettings.price) as (amount: number) => number,
+      doubles: eval(rawSettings.doubles) as (amount: number) => number
+    }
+
+    return class CustomInvestment extends Investment {
+      settings: InvestmentSettings
+      constructor(parentGame: Game) {
+        super(parentGame, {
+          name: settings.name,
+          singleProfit: settings.singleProfit,
+          startDuration: settings.startDuration
+        })
+
+        this.settings = settings
+      }
+
+      price(amount: number = this.amount) {
+        return this.settings.price(amount)
+      }
+
+      doubles() {
+        return this.settings.doubles(this.amount)
+      }
+    }
   }
 }

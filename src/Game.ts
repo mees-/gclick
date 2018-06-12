@@ -1,4 +1,4 @@
-import Investment from './Investment'
+import Investment, { rawInvestmentSettings } from './Investment'
 import DividingNumber from './DividingNumber'
 
 export default class Game {
@@ -50,5 +50,9 @@ export default class Game {
     for (const investment of this.investments) {
       investment.stop()
     }
+  }
+
+  static fromSettings(settings: rawInvestmentSettings[]) {
+    return new Game(settings.map(el => Investment.fromSettings(el)))
   }
 }
