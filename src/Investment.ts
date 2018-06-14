@@ -182,26 +182,22 @@ export default abstract class Investment {
       price: eval(rawSettings.price) as (amount: number) => number,
       doubles: eval(rawSettings.doubles) as (amount: number) => number
     }
-
-    return class CustomInvestment extends Investment {
-      settings: InvestmentSettings
+    return eval(`class ${settings.name} extends Investment {
       constructor(parentGame: Game) {
         super(parentGame, {
           name: settings.name,
           singleProfit: settings.singleProfit,
           startDuration: settings.startDuration
         })
-
-        this.settings = settings
       }
 
       price(amount: number = this.amount) {
-        return this.settings.price(amount)
+        return settings.price(amount)
       }
 
       doubles() {
-        return this.settings.doubles(this.amount)
+        return settings.doubles(this.amount)
       }
-    }
+    }`)
   }
 }
