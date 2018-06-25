@@ -1,8 +1,6 @@
 import benchmark from './bench'
 import Game, { InvestmentSettings } from '..'
-import Bignum from 'bignumber.js'
 import preset from './preset'
-import { POINT_CONVERSION_COMPRESSED } from 'constants'
 
 const config = {
   loops: 2000,
