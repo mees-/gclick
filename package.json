@@ -6,7 +6,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "npm run build && ava",
-    "build": "tsc",
+    "build": "tsc -p ./tsconfig.json",
+    "build:bench": "tsc -p ./bench/tsconfig.json",
+    "bench": "npm run build:bench && node dist/bench/index.js | tee ./benchmark-results.txt",
     "prepare": "npm run-script build"
   },
   "repository": {
@@ -24,9 +26,12 @@
     "url": "https://github.com/mees-/gclick/issues"
   },
   "homepage": "https://github.com/mees-/gclick#readme",
-  "dependencies": {},
+  "dependencies": {
+    "bignumber.js": "^7.2.1"
+  },
   "devDependencies": {
     "@types/delay": "^2.0.1",
+    "@types/node": "^10.3.5",
     "ava": "^0.25.0",
     "delay": "^3.0.0",
     "typescript": "^2.9.1"

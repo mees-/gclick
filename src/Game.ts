@@ -1,5 +1,8 @@
-import Investment, { rawInvestmentSettings } from './Investment'
-import DividingNumber from './DividingNumber'
+import Investment, {
+  rawInvestmentSettings,
+  InvestmentSettings
+} from './Investment'
+import Bignum from 'bignumber.js'
 
 export default class Game {
   investments: Array<Investment>
@@ -10,28 +13,18 @@ export default class Game {
     )
   }
 
-  private _money = new DividingNumber()
-
-  get money(): number {
-    return this._money.value
-  }
-  set money(val: number) {
-    this._money.value = val
-  }
-
-  get divisionLevel(): number {
-    return this._money.dividerLevel
-  }
+  money = new Bignum(0)
 
   set divisionLevel(val: number) {
     throw new Error('divisionLevel is read-only')
   }
 
-  transact(money: number) {
-    if (this.money + money < 0) {
+  transact(money: Bignum | number) {
+    // ow(money, ow.number.greaterThanOrEqual(0))
+    if (this.money.plus(money).isLessThan(0)) {
       throw new Error('Cannot deduct more money than owned')
     }
-    this.money += money
+    this.money = this.money.plus(money)
   }
 
   tick() {
@@ -52,7 +45,10 @@ export default class Game {
     }
   }
 
-  static fromSettings(settings: rawInvestmentSettings[]) {
-    return new Game(settings.map(el => Investment.fromSettings(el)))
+  static fromSettings(
+    settings: Array<rawInvestmentSettings | InvestmentSettings>
+  ) {
+    const investments = settings.map(el => Investment.fromSettings(el))
+    return new Game(investments)
   }
 }

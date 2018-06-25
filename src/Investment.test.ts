@@ -1,19 +1,20 @@
 import test from 'ava'
 import Investment, { InvestmentOptions } from './Investment'
 import Game from './Game'
+import Bignum from 'bignumber.js'
 import delay from 'delay'
 
 class DummyGame extends Game {
-  transactCallback: (amount: number) => any
+  transactCallback: (amount: Bignum) => any
   constructor(
     investments: Array<{ new (game: Game): Investment }>,
-    transactCallback: (amount: number) => any = () => {}
+    transactCallback: (amount: Bignum) => any = () => {}
   ) {
     super(investments)
     this.transactCallback = transactCallback
   }
 
-  transact(amount: number) {
+  transact(amount: Bignum) {
     super.transact(amount)
     this.transactCallback(amount)
   }
@@ -32,7 +33,7 @@ class TestInvestment extends Investment {
   ) {
     super(game, options)
   }
-  price(amount: number = this.amount) {
+  price(amount: Bignum = this.amount) {
     return amount
   }
   doubles(): number {
@@ -52,58 +53,62 @@ test('Investment#buy', t => {
   t.notThrows(() => investment.buy())
 
   // investment should cost one while game.money = 0, so buy should throw
-  game.money = 0
+  game.money = new Bignum(0)
   t.throws(() => investment.buy())
 })
 
 test('Investment#cycle', t => {
-  let lastAdded = null
-  const transactCallback = (amount: number) => {
+  let lastAdded: Bignum = new Bignum(0)
+  const transactCallback = (amount: Bignum) => {
     lastAdded = amount
   }
   const game = new DummyGame([TestInvestment], transactCallback)
   const [investment] = game.investments
 
-  investment.amount = 0
+  investment.amount = new Bignum(0)
   investment.cycle()
-  t.is(lastAdded, 0)
-  investment.amount = 1
+  t.true(lastAdded.isEqualTo(0))
+  investment.amount = new Bignum(1)
   investment.cycle()
-  t.is(lastAdded, investment.singleProfit)
+  t.true(lastAdded.isEqualTo(investment.singleProfit))
 
   investment.cycle(10)
-  t.is(lastAdded, 10 * investment.singleProfit)
+  t.true(lastAdded.isEqualTo(10 * investment.singleProfit))
 
-  investment.amount = 5
+  investment.amount = new Bignum(5)
   investment.cycle(2)
-  t.is(lastAdded, investment.singleProfit * 5 * 2)
+  t.true(lastAdded.isEqualTo(investment.singleProfit * 5 * 2))
 })
 
 test('Investment#tick', async t => {
-  let lastAdded = 0
-  const transactCallback = (amount: number) => (lastAdded = amount)
+  let lastAdded: Bignum = new Bignum(0)
+  const transactCallback = (amount: Bignum) => (lastAdded = amount)
   const game = new DummyGame([TestInvestment], transactCallback)
   const [investment] = game.investments
 
-  investment.amount = 1
+  investment.amount = new Bignum(1)
 
   investment.lastCycle = Date.now()
   investment.tick()
-  t.is(lastAdded, 0)
+  t.true(lastAdded.isEqualTo(0))
   await delay(investment.currentDuration)
   investment.tick()
-  t.is(lastAdded, investment.singleProfit)
+  t.true(lastAdded.isEqualTo(investment.singleProfit))
   await delay(2 * investment.currentDuration)
   investment.tick()
-  t.is(lastAdded, 2 * investment.singleProfit)
+  t.true(lastAdded.isEqualTo(2 * investment.singleProfit))
 })
 
 test('Investment#calculatePrice', t => {
   const game = new Game([TestInvestment])
   const [investment] = game.investments
 
-  investment.amount = 1
-  t.is(investment.calculatePrice(10), 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10)
+  investment.amount = new Bignum(1)
+  t.true(
+    investment
+      .calculatePrice(10)
+      .isEqualTo(1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10)
+  )
 })
 
 test('Investment#maxBuy', t => {
@@ -116,5 +121,5 @@ test('Investment#maxBuy', t => {
     amount++
     price += amount
   }
-  t.is(investment.maxBuy(100), amount)
+  t.true(investment.maxBuy(new Bignum(100)).isEqualTo(amount))
 })

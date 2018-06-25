@@ -1,5 +1,5 @@
 import Game from './Game'
-import DividingNumber from './DividingNumber'
+import Bignum from 'bignumber.js'
 
 export type InvestmentOptions = {
   name: string
@@ -7,17 +7,17 @@ export type InvestmentOptions = {
   startDuration: number
 }
 
-export type Interval = {
+type Interval = {
   id?: number
   lastDuration: number
 }
 
-type InvestmentSettings = {
+export type InvestmentSettings = {
   name: string
   singleProfit: number
   startDuration: number
-  doubles: (amount: number) => number
-  price: (amount: number) => number
+  doubles: (amount: Bignum) => number
+  price: (amount: Bignum) => Bignum
 }
 
 export type rawInvestmentSettings = {
@@ -45,20 +45,14 @@ export default abstract class Investment {
     this.startDuration = startDuration
     this.singleProfit = singleProfit
   }
-
+  amount = new Bignum(0)
   lastCycle = Date.now()
   interval: Interval = {
     lastDuration: this.currentDuration
   }
-  // the private keyword here is omitted because of a typescript bug: https://github.com/Microsoft/TypeScript/issues/17293
-  // this is because the investment class is extended in an expression in createPresetFromSettings.ts
-  // private
-  _profitPerCycle = new DividingNumber(this.amount * this.singleProfit)
-  // private
-  _amount = 0
 
   // default stubs
-  abstract price(amount?: number): number
+  abstract price(amount?: Bignum): Bignum
 
   abstract doubles(): number
 
@@ -67,29 +61,12 @@ export default abstract class Investment {
     return this.startDuration * Math.pow(0.5, this.doubles())
   }
 
-  get profitPerCycle(): number {
-    return this._profitPerCycle.value
+  get profitPerCycle(): Bignum {
+    return this.amount.times(this.singleProfit)
   }
 
-  set profitPerCycle(val: number) {
-    this._profitPerCycle.value = val
-  }
-
-  get divisionLevel(): number {
-    return this._profitPerCycle.dividerLevel
-  }
-
-  get amount(): number {
-    return this._amount
-  }
-
-  set amount(val: number) {
-    this._amount = val
-    this.profitPerCycle = this.amount * this.singleProfit
-  }
-
-  get profitPerSecond(): number {
-    return this.profitPerCycle / (this.currentDuration / 1000)
+  get profitPerSecond(): Bignum {
+    return this.profitPerCycle.dividedBy(this.currentDuration / 1000)
   }
 
   get timeSinceLastCycle(): number {
@@ -106,7 +83,7 @@ export default abstract class Investment {
 
   // methods
   cycle(times: number = 1) {
-    this.parentGame.transact(this.profitPerCycle * times)
+    this.parentGame.transact(this.profitPerCycle.times(times))
     this.lastCycle += times * this.currentDuration
   }
 
@@ -134,23 +111,27 @@ export default abstract class Investment {
     }
   }
 
-  calculatePrice(amount: number): number {
-    let price = 0
-    for (let i = 0; i < amount; i++) {
-      price += this.price(this.amount + i)
+  calculatePrice(amount: Bignum | number): Bignum {
+    if (!Bignum.isBigNumber(amount)) {
+      amount = new Bignum(amount)
+    }
+    let price = new Bignum(0)
+    for (let i = 0; (amount as Bignum).isGreaterThan(i); i++) {
+      price = price.plus(this.price(this.amount.plus(i)))
     }
     return price
   }
 
-  maxBuy(money: number): number {
-    let amount = 0
-    while (this.calculatePrice(amount + 1) <= money) amount++
+  maxBuy(money: Bignum): Bignum {
+    let amount = new Bignum(0)
+    while (this.calculatePrice(amount.plus(1)).isLessThanOrEqualTo(money))
+      amount = amount.plus(1)
     return amount
   }
 
   buy(amount: number = 1) {
-    this.parentGame.transact(-1 * this.calculatePrice(amount))
-    this.amount += amount
+    this.parentGame.transact(this.calculatePrice(amount).times(-1))
+    this.amount = this.amount.plus(amount)
   }
 
   // a bunch of setters for read-only properties
@@ -160,7 +141,7 @@ export default abstract class Investment {
   set totalProfit(val: number) {
     throw new Error('totalProfit is read-only')
   }
-  set profitPerSecond(val: number) {
+  set profitPerSecond(val: Bignum) {
     throw new Error('profitPerSecond is read-only')
   }
   set timeSinceLastCycle(val: number) {
@@ -176,13 +157,19 @@ export default abstract class Investment {
     throw new Error('divisionLevel is read-only')
   }
 
-  static fromSettings(rawSettings: rawInvestmentSettings) {
+  static fromSettings(rawSettings: rawInvestmentSettings | InvestmentSettings) {
     const settings: InvestmentSettings = {
       ...rawSettings,
-      price: eval(rawSettings.price) as (amount: number) => number,
-      doubles: eval(rawSettings.doubles) as (amount: number) => number
+      price:
+        typeof rawSettings.price === 'string'
+          ? (eval(rawSettings.price) as (amount: Bignum) => Bignum)
+          : rawSettings.price,
+      doubles:
+        typeof rawSettings.doubles === 'string'
+          ? (eval(rawSettings.doubles) as (amount: Bignum) => number)
+          : rawSettings.doubles
     }
-    return eval(`class ${settings.name} extends Investment {
+    return class CustomInvestment extends Investment {
       constructor(parentGame: Game) {
         super(parentGame, {
           name: settings.name,
@@ -191,13 +178,13 @@ export default abstract class Investment {
         })
       }
 
-      price(amount: number = this.amount) {
+      price(amount: Bignum = this.amount) {
         return settings.price(amount)
       }
 
       doubles() {
         return settings.doubles(this.amount)
       }
-    }`)
+    }
   }
 }

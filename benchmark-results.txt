@@ -1,0 +1,7 @@
+config.loops:		2000
+config.runs:		100
+
+total duration:		7.372s
+avg run:		73.54240ms
+avg call:		0.03677ms
+calls per second:	27195.19489
