@@ -16,8 +16,8 @@ export type InvestmentSettings = {
   name: string
   singleProfit: number
   startDuration: number
-  doubles: (amount: Bignum) => number
-  price: (amount: Bignum) => Bignum
+  doubles: (amount: number) => number
+  price: (amount: number) => number
 }
 
 export type rawInvestmentSettings = {
@@ -45,14 +45,14 @@ export default abstract class Investment {
     this.startDuration = startDuration
     this.singleProfit = singleProfit
   }
-  amount = new Bignum(0)
+  amount = 0
   lastCycle = Date.now()
   interval: Interval = {
     lastDuration: this.currentDuration
   }
 
   // default stubs
-  abstract price(amount?: Bignum): Bignum
+  abstract price(amount?: number): number
 
   abstract doubles(): number
 
@@ -61,12 +61,12 @@ export default abstract class Investment {
     return this.startDuration * Math.pow(0.5, this.doubles())
   }
 
-  get profitPerCycle(): Bignum {
-    return this.amount.times(this.singleProfit)
+  get profitPerCycle(): number {
+    return this.amount * this.singleProfit
   }
 
-  get profitPerSecond(): Bignum {
-    return this.profitPerCycle.dividedBy(this.currentDuration / 1000)
+  get profitPerSecond(): number {
+    return this.profitPerCycle / this.currentDuration / 1000
   }
 
   get timeSinceLastCycle(): number {
@@ -83,7 +83,7 @@ export default abstract class Investment {
 
   // methods
   cycle(times: number = 1) {
-    this.parentGame.transact(this.profitPerCycle.times(times))
+    this.parentGame.transact(this.profitPerCycle * times)
     this.lastCycle += times * this.currentDuration
   }
 
@@ -111,27 +111,23 @@ export default abstract class Investment {
     }
   }
 
-  calculatePrice(amount: Bignum | number): Bignum {
-    if (!Bignum.isBigNumber(amount)) {
-      amount = new Bignum(amount)
-    }
-    let price = new Bignum(0)
-    for (let i = 0; (amount as Bignum).isGreaterThan(i); i++) {
-      price = price.plus(this.price(this.amount.plus(i)))
+  calculatePrice(amount: number): number {
+    let price = 0
+    for (let i = 0; amount > i; i++) {
+      price = price + this.price(this.amount + i)
     }
     return price
   }
 
-  maxBuy(money: Bignum): Bignum {
-    let amount = new Bignum(0)
-    while (this.calculatePrice(amount.plus(1)).isLessThanOrEqualTo(money))
-      amount = amount.plus(1)
+  maxBuy(money: number): number {
+    let amount = 0
+    while (this.calculatePrice(amount + 1) <= money) amount = amount + 1
     return amount
   }
 
   buy(amount: number = 1) {
-    this.parentGame.transact(this.calculatePrice(amount).times(-1))
-    this.amount = this.amount.plus(amount)
+    this.parentGame.transact(this.calculatePrice(amount) * -1)
+    this.amount = this.amount + amount
   }
 
   // a bunch of setters for read-only properties
@@ -141,7 +137,7 @@ export default abstract class Investment {
   set totalProfit(val: number) {
     throw new Error('totalProfit is read-only')
   }
-  set profitPerSecond(val: Bignum) {
+  set profitPerSecond(val: number) {
     throw new Error('profitPerSecond is read-only')
   }
   set timeSinceLastCycle(val: number) {
@@ -162,11 +158,11 @@ export default abstract class Investment {
       ...rawSettings,
       price:
         typeof rawSettings.price === 'string'
-          ? (eval(rawSettings.price) as (amount: Bignum) => Bignum)
+          ? (eval(rawSettings.price) as (amount: number) => number)
           : rawSettings.price,
       doubles:
         typeof rawSettings.doubles === 'string'
-          ? (eval(rawSettings.doubles) as (amount: Bignum) => number)
+          ? (eval(rawSettings.doubles) as (amount: number) => number)
           : rawSettings.doubles
     }
     return class CustomInvestment extends Investment {
@@ -178,7 +174,7 @@ export default abstract class Investment {
         })
       }
 
-      price(amount: Bignum = this.amount) {
+      price(amount: number = this.amount) {
         return settings.price(amount)
       }
 

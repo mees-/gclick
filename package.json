@@ -8,7 +8,7 @@
     "test": "npm run build && ava",
     "build": "tsc -p ./tsconfig.json",
     "build:bench": "tsc -p ./bench/tsconfig.json",
-    "bench": "npm run build:bench && node dist/bench/index.js | tee ./benchmark-results.txt",
+    "bench": "npm run build && npm run build:bench && node dist/bench/index.js | tee ./benchmark-results.txt",
     "prepare": "npm run-script build"
   },
   "repository": {

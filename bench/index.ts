@@ -20,11 +20,9 @@ const result = benchmark<{ game: Game }>({
   }),
   beforeRun: ctx => {
     for (const investment of ctx.game.investments) {
-      investment.amount = new Bignum(
-        Math.random() * 10 * Math.pow(10, Math.random() * 100)
-      )
+      investment.amount = Math.random() * 10 * Math.pow(10, Math.random() * 100)
     }
-    ctx.game.money = new Bignum(0)
+    ctx.game.money = 0
   }
 })
 

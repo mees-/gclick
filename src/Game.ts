@@ -13,18 +13,18 @@ export default class Game {
     )
   }
 
-  money = new Bignum(0)
+  money = 0
 
   set divisionLevel(val: number) {
     throw new Error('divisionLevel is read-only')
   }
 
-  transact(money: Bignum | number) {
+  transact(money: number) {
     // ow(money, ow.number.greaterThanOrEqual(0))
-    if (this.money.plus(money).isLessThan(0)) {
+    if (this.money + money < 0) {
       throw new Error('Cannot deduct more money than owned')
     }
-    this.money = this.money.plus(money)
+    this.money = this.money + money
   }
 
   tick() {

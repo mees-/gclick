@@ -6,10 +6,10 @@ const investments: InvestmentSettings[] = [
     singleProfit: 5,
     startDuration: 4,
     doubles: amount => {
-      return amount.dividedBy(25).toNumber()
+      return amount / 25
     },
     price: amount => {
-      return amount.pow(2).dividedBy(amount.squareRoot())
+      return Math.pow(amount, 2) / Math.sqrt(amount)
     }
   },
   {
@@ -17,10 +17,10 @@ const investments: InvestmentSettings[] = [
     singleProfit: 1,
     startDuration: 3,
     doubles: amount => {
-      return amount.dividedBy(50).toNumber()
+      return amount / 50
     },
     price: amount => {
-      return amount.multipliedBy(2)
+      return amount * 2
     }
   },
   {
@@ -28,13 +28,10 @@ const investments: InvestmentSettings[] = [
     singleProfit: 20,
     startDuration: 15,
     doubles: amount => {
-      return amount.dividedBy(13).toNumber()
+      return amount / 13
     },
     price: amount => {
-      return amount
-        .dividedBy(4)
-        .pow(3)
-        .dividedBy(amount.squareRoot().dividedBy(2))
+      return Math.pow(amount / 4, 3) / (Math.sqrt(amount) / 2)
     }
   },
   {
@@ -42,13 +39,10 @@ const investments: InvestmentSettings[] = [
     singleProfit: 20,
     startDuration: 100,
     doubles: amount => {
-      return amount.dividedBy(100).toNumber()
+      return amount / 100
     },
     price: amount => {
-      return amount
-        .pow(2)
-        .dividedBy(amount.squareRoot())
-        .plus(amount)
+      return Math.pow(amount, 2) / Math.sqrt(amount) + amount
     }
   }
 ]
