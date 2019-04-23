@@ -33,7 +33,7 @@
   "devDependencies": {
     "@types/delay": "^2.0.1",
     "@types/node": "^10.3.5",
-    "ava": "^0.25.0",
+    "ava": "^1.4.1",
     "delay": "^3.0.0",
     "typescript": "^2.9.2"
   },
